@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Se_exp9 | Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+            color: #1e293b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 245px;
+            background: #172554;
+            color: white;
+            padding: 25px 18px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .logo span {
+            color: #60a5fa;
+        }
+
+        .nav-title {
+            color: #94a3b8;
+            font-size: 12px;
+            margin: 25px 10px 12px;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 13px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .topbar p {
+            color: #64748b;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 43px;
+            height: 43px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+        }
+
+        /* Statistics */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 3px 15px rgba(15, 23, 42, 0.04);
+        }
+
+        .card-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .card h2 {
+            font-size: 28px;
+            margin: 15px 0 10px;
+        }
+
+        .growth {
+            color: #16a34a;
+            font-size: 13px;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Charts */
+        .charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+        }
+
+        select {
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            padding: 8px;
+            background: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        th, td {
+            padding: 16px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        th {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .completed {
+            color: #15803d;
+            background: #dcfce7;
+        }
+
+        .pending {
+            color: #b45309;
+            background: #fef3c7;
+        }
+
+        .cancelled {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .menu-btn {
+            display: none;
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 10px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            margin-top: 25px;
+            font-size: 13px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+                position: fixed;
+                z-index: 10;
+                top: 0;
+                bottom: 0;
+                left: 0;
+            }
+
+            .sidebar.open {
+                display: block;
+            }
+
+            .main {
+                padding: 18px;
+            }
+
+            .menu-btn {
+                display: inline-block;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .topbar h1 {
+                font-size: 22px;
+            }
+
+            .profile .user-info {
+                display: none;
+            }
+
+            .stats {
+                gap: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .card h2 {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">SE<span>_EXP9</span></div>
+
+        <div class="nav-title">Main Menu</div>
+
+        <a href="#dashboard" class="nav-link active">📊 Dashboard</a>
+        <a href="#analytics" class="nav-link">📈 Analytics</a>
+        <a href="#customers" class="nav-link">👥 Customers</a>
+        <a href="#orders" class="nav-link">🛒 Orders</a>
+
+        <div class="nav-title">Preferences</div>
+
+        <a href="#settings" class="nav-link">⚙️ Settings</a>
+        <a href="#help" class="nav-link">❓ Help Center</a>
+    </aside>
+
+    <!-- Main Dashboard -->
+    <main class="main" id="dashboard">
+
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+                <div>
+                    <h1>Dashboard Overview</h1>
+                    <p>Welcome back! Here's what's happening today.</p>
+                </div>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">PJ</div>
+                <div class="user-info">
+                    <strong>Pravin Jain</strong>
+                    <p style="color:#64748b;font-size:13px;margin-top:4px;">
+                        Administrator
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Statistics Cards -->
+        <section class="stats">
+
+            <div class="card">
+                <div class="icon">💰</div>
+                <p class="card-label">Total Revenue</p>
+                <h2>₹84,250</h2>
+                <p class="growth">↑ 12.5% this month</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">👥</div>
+                <p class="card-label">Total Customers</p>
+                <h2>2,450</h2>
+                <p class="growth">↑ 8.2% this month</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">🛒</div>
+                <p class="card-label">Total Orders</p>
+                <h2>1,280</h2>
+                <p class="growth">↑ 15.3% this month</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📦</div>
+                <p class="card-label">Products Sold</p>
+                <h2>3,840</h2>
+                <p class="growth">↑ 6.8% this month</p>
+            </div>
+
+        </section>
+
+        <!-- Charts -->
+        <section class="charts" id="analytics">
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Revenue Overview</h3>
+
+                    <select id="period" onchange="updateChart()">
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Order Status</h3>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="orderChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Recent Orders -->
+        <section class="card" id="orders">
+
+            <div class="card-header">
+                <h3>Recent Orders</h3>
+                <span style="color:#64748b;font-size:13px;">
+                    Latest transactions
+                </span>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>#ORD-1001</td>
+                            <td>Rahul Sharma</td>
+                            <td>12 Oct 2026</td>
+                            <td>₹2,500</td>
+                            <td><span class="status completed">Completed</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>#ORD-1002</td>
+                            <td>Priya Patel</td>
+                            <td>12 Oct 2026</td>
+                            <td>₹1,800</td>
+                            <td><span class="status pending">Pending</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>#ORD-1003</td>
+                            <td>Amit Verma</td>
+                            <td>11 Oct 2026</td>
+                            <td>₹3,200</td>
+                            <td><span class="status completed">Completed</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>#ORD-1004</td>
+                            <td>Neha Singh</td>
+                            <td>10 Oct 2026</td>
+                            <td>₹950</td>
+                            <td><span class="status cancelled">Cancelled</span></td>
+                        </tr>
+
+                        <tr>
+                            <td>#ORD-1005</td>
+                            <td>Arjun Mehta</td>
+                            <td>10 Oct 2026</td>
+                            <td>₹4,100</td>
+                            <td><span class="status completed">Completed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <footer>
+            © 2026 SE_EXP9 Dashboard. All rights reserved.
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    // Mobile sidebar
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("open");
+    }
+
+    // Revenue chart
+    const revenueCanvas = document.getElementById("revenueChart");
+
+    const revenueChart = new Chart(revenueCanvas, {
+        type: "line",
+
+        data: {
+            labels: [
+                "Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"
+            ],
+
+            datasets: [{
+                label: "Revenue (₹)",
+                data: [
+                    12000, 19000, 15000, 25000,
+                    22000, 32000, 28000, 38000,
+                    35000, 45000, 42000, 52000
+                ],
+
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37, 99, 235, 0.12)",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "#f1f5f9"
+                    }
+                },
+
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Weekly/monthly chart data
+    function updateChart() {
+        const period = document.getElementById("period").value;
+
+        if (period === "weekly") {
+            revenueChart.data.labels = [
+                "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+            ];
+
+            revenueChart.data.datasets[0].data = [
+                5000, 7500, 6200, 9000, 11000, 8500, 13000
+            ];
+        } else {
+            revenueChart.data.labels = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+
+            revenueChart.data.datasets[0].data = [
+                12000, 19000, 15000, 25000, 22000, 32000,
+                28000, 38000, 35000, 45000, 42000, 52000
+            ];
+        }
+
+        revenueChart.update();
+    }
+
+    // Order status chart
+    new Chart(document.getElementById("orderChart"), {
+        type: "doughnut",
+
+        data: {
+            labels: ["Completed", "Pending", "Cancelled"],
+
+            datasets: [{
+                data: [65, 25, 10],
+
+                backgroundColor: [
+                    "#2563eb",
+                    "#f59e0b",
+                    "#ef4444"
+                ],
+
+                borderWidth: 0,
+                hoverOffset: 8
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            },
+
+            cutout: "68%"
+        }
+    });
+
+    // Sidebar active link
+    document.querySelectorAll(".nav-link").forEach(function(link) {
+        link.addEventListener("click", function() {
+            document.querySelectorAll(".nav-link").forEach(function(item) {
+                item.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+            if (window.innerWidth <= 700) {
+                document.getElementById("sidebar").classList.remove("open");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
